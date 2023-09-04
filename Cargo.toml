@@ -1,0 +1,6 @@
+# Workspace members
+[workspace]
+members = [
+    "voiceland-server"
+]
+resolver = "2"

@@ -1,2 +1,3 @@
-# voiceland
-Private until "stable" development
+# Voiceland
+
+Under development.
