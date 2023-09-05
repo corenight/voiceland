@@ -1,6 +1,16 @@
 # Workspace members
 [workspace]
 members = [
-    "voiceland-server"
+    "voiceland-core"
 ]
 resolver = "2"
+
+[workspace.dependencies]
+
+# Common dependencies
+quinn = "0"
+rustls = { version = "0", features = ["dangerous_configuration", "quic"] }
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_yaml = "0.9"
+anyhow = "1.0"

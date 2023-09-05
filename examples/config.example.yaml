@@ -1,0 +1,37 @@
+# Server example configuration
+
+# ################################
+
+# Server address (required - Rust SocketAddr)
+#
+# - Address can be IPv4/IPv6
+# - Port should be 6050 and clients will automatically use that.
+#   You can set custom port at client, but I recommend use the default one
+# - Address should point to 0.0.0.0 / [::]
+address: "[::]:6050"
+
+# ################################
+
+# TLS configuration (required)
+# This covers TLS configuration, mainly certificates. TLS is required because QUIC works over TLS 1.3
+# 
+# If there's certificate, use "cert" and "key". If want a self-signed certificate, use "server_name"
+# If using self-signed cert, server name should be "voiceland"
+tls_cert:
+  cert: examples/server.cert
+  key: examples/server.key
+  #server_name: voiceland
+
+# ################################
+
+# QUIC configuration
+# 
+# This allows to set some Quinn options
+quic_conf:
+  # Keep alive interval (u64 - milliseconds)
+  #
+  # - This must be lower than `max_idle_timeout`
+  keep_alive_interval: 5000
+
+  # Max idle timeout (u64 - milliseconds)
+  max_idle_timeout: 10000
