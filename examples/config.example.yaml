@@ -19,7 +19,7 @@ address: "[::]:6050"
 # If using self-signed cert, server name should be "voiceland"
 tls_cert:
   #cert: examples/server.cert
-  key: examples/server.key
+  #key: examples/server.key
   server_name: voiceland
 
 # ################################

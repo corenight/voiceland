@@ -2,7 +2,6 @@ use std::net::SocketAddr;
 
 use serde::{Deserialize, Serialize};
 
-// TODO finish QuicConfiguration
 /// QUIC configuration structure
 /// These fields represent part of Quinn configuration methods
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
@@ -10,10 +9,10 @@ pub struct QuicConfiguration {
     /// Keep alive interval (ms)
     ///
     /// This must be lower than `max_idle_timeout`
-    pub keep_alive_interval: u64,
+    pub keep_alive_interval: Option<u64>,
 
     /// Max idle timeout (ms)
-    pub max_idle_timeout: u64,
+    pub max_idle_timeout: Option<u64>,
 }
 
 /// TLS certificate configuration structure
@@ -46,4 +45,12 @@ pub struct Configuration {
      */
     /// QUIC basic configuration
     pub quic_conf: Option<QuicConfiguration>,
+
+    /// Data buffer
+    /// This should be max u16
+    pub buf_size: Option<u128>,
+
+    /// MPMC capacity
+    /// This should be max u8
+    pub mpmc_capacity: Option<u128>,
 }

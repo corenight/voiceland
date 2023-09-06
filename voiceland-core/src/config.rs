@@ -4,7 +4,7 @@ use anyhow::{bail, Result};
 use tokio::fs;
 use voiceland_common::logs;
 
-use crate::structs;
+use crate::structs::{self, Configuration, QuicConfiguration, TlsCertConfiguration};
 
 /// Reads the configuration file to set several parameters of server.
 ///

@@ -13,3 +13,6 @@ serde_yaml = { workspace = true }
 anyhow = { workspace = true }
 
 voiceland-common = { workspace = true }
+
+rustls-pemfile = "1"
+rcgen = "0.11.1"
