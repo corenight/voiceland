@@ -1,7 +1,8 @@
 # Workspace members
 [workspace]
 members = [
-    "voiceland-core"
+    "voiceland-core",
+    "voiceland-common"
 ]
 resolver = "2"
 
@@ -14,3 +15,7 @@ tokio = { version = "1", features = ["full"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_yaml = "0.9"
 anyhow = "1.0"
+
+
+# Internal packages
+voiceland-common = { path = "./voiceland-common" }

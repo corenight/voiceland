@@ -18,9 +18,9 @@ address: "[::]:6050"
 # If there's certificate, use "cert" and "key". If want a self-signed certificate, use "server_name"
 # If using self-signed cert, server name should be "voiceland"
 tls_cert:
-  cert: examples/server.cert
+  #cert: examples/server.cert
   key: examples/server.key
-  #server_name: voiceland
+  server_name: voiceland
 
 # ################################
 

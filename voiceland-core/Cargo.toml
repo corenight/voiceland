@@ -2,6 +2,7 @@
 name = "voiceland-core"
 version = "1.0.0"
 edition = "2021"
+license = "AGPL-3.0"
 
 [dependencies]
 quinn = { workspace = true }
@@ -10,3 +11,5 @@ tokio = { workspace = true }
 serde = { workspace = true }
 serde_yaml = { workspace = true }
 anyhow = { workspace = true }
+
+voiceland-common = { workspace = true }
