@@ -1,5 +1,3 @@
-use crate::structs::QuicConfiguration;
-
 // AGPL-3.0 notice
 pub const LICENSE_NOTICE: &str = r#"
 Corenight Voiceland - VoIP over QUIC
@@ -18,9 +16,3 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 "#;
-
-// QUIC default config
-pub const DEFAULT_QUIC_CONFIG: QuicConfiguration = QuicConfiguration {
-    keep_alive_interval: Some(5_000),
-    max_idle_timeout: Some(10_000),
-};

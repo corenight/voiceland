@@ -31,7 +31,7 @@ quic_conf:
   # Keep alive interval (u64 - milliseconds)
   #
   # - This must be lower than `max_idle_timeout`
-  keep_alive_interval: 5000
+  #keep_alive_interval: 500012
 
   # Max idle timeout (u64 - milliseconds)
-  max_idle_timeout: 10000
+  #max_idle_timeout: 10000

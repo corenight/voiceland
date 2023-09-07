@@ -45,12 +45,4 @@ pub struct Configuration {
      */
     /// QUIC basic configuration
     pub quic_conf: Option<QuicConfiguration>,
-
-    /// Data buffer
-    /// This should be max u16
-    pub buf_size: Option<u128>,
-
-    /// MPMC capacity
-    /// This should be max u8
-    pub mpmc_capacity: Option<u128>,
 }

@@ -4,7 +4,9 @@ use anyhow::{bail, Result};
 use tokio::fs;
 use voiceland_common::logs;
 
-use crate::structs::{self, Configuration, QuicConfiguration, TlsCertConfiguration};
+use crate::structs;
+
+pub mod default;
 
 /// Reads the configuration file to set several parameters of server.
 ///
@@ -42,6 +44,8 @@ pub async fn config(dir: &Path) -> Result<structs::Configuration> {
             "Note: consider using a certificate. If you're sure what you're doing, ignore this.",
         );
     }
+
+    println!("{:#?}", config);
 
     Ok(config)
 }

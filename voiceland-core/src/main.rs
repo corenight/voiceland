@@ -1,12 +1,15 @@
 use std::{env, path::Path, process::exit, sync::Arc, time::Duration};
 
 use anyhow::{bail, Result};
-use config::config;
-use consts::DEFAULT_QUIC_CONFIG;
 use quinn::Endpoint;
 use rustls::{Certificate, PrivateKey};
 use rustls_pemfile::{certs, pkcs8_private_keys, rsa_private_keys};
 use tokio::{fs, sync::broadcast};
+
+use config::{
+    config,
+    default::{self, QUIC_CONFIG},
+};
 use voiceland_common::logs;
 
 mod config;
@@ -85,13 +88,20 @@ async fn run() -> Result<()> {
     // Transport configuration
     let transport_config = Arc::get_mut(&mut server_config.transport).unwrap();
 
-    let quic_config = config.quic_conf.unwrap_or(DEFAULT_QUIC_CONFIG);
+    let quic_config = config.quic_conf.unwrap_or(QUIC_CONFIG);
 
     transport_config.keep_alive_interval(Some(Duration::from_millis(
-        quic_config.keep_alive_interval.unwrap(),
+        quic_config
+            .keep_alive_interval
+            .unwrap_or(default::KEEP_ALIVE_INTERVAL),
     )));
     transport_config.max_idle_timeout(Some(
-        Duration::from_secs(quic_config.max_idle_timeout.unwrap()).try_into()?,
+        Duration::from_secs(
+            quic_config
+                .max_idle_timeout
+                .unwrap_or(default::MAX_IDLE_TIMEOUT),
+        )
+        .try_into()?,
     ));
 
     logs::ok("QUIC socket configuration set");
@@ -100,28 +110,23 @@ async fn run() -> Result<()> {
     // Endpoint
     let endpoint = Endpoint::server(server_config, config.address)?;
 
-    logs::ok("Server ready!");
-    logs::info(format!("Server listening at {}", endpoint.local_addr()?));
+    logs::ok(format!(
+        "Server ready and listening at {}",
+        endpoint.local_addr()?
+    ));
 
     // Socket broadcast
     // TODO This needs to be restructured
-    let (tx, _) = broadcast::channel(config.mpmc_capacity.unwrap_or(u8::MAX as u128) as usize);
+    let (tx, _) = broadcast::channel(u8::MAX as usize);
 
     // Connection handler
     while let Some(conn) = endpoint.accept().await {
         let tx = tx.clone();
 
         tokio::spawn(async move {
-            if let Err(err) = handler::handler(
-                conn,
-                config.buf_size.unwrap_or(u16::MAX as u128) as usize,
-                tx,
-            )
-            .await
-            {
-                bail!(err)
+            if let Err(err) = handler::handler(conn, tx).await {
+                logs::error(err);
             }
-            Ok(())
         });
     }
 

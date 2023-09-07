@@ -2,18 +2,19 @@ use anyhow::{bail, Result};
 use quinn::{Connecting, ConnectionError};
 use tokio::sync::broadcast::Sender;
 
-pub async fn handler(conn: Connecting, buf: usize, tx: Sender<Vec<u8>>) -> Result<()> {
+pub async fn handler(conn: Connecting, tx: Sender<Vec<u8>>) -> Result<()> {
     let conn = conn.await?;
 
     loop {
         let (mut send, mut recv) = match conn.accept_bi().await {
             Err(ConnectionError::ApplicationClosed { .. })
-            | Err(ConnectionError::ConnectionClosed { .. }) => break,
+            | Err(ConnectionError::ConnectionClosed { .. })
+            | Err(ConnectionError::TimedOut { .. }) => break,
             Err(err) => bail!(err),
             Ok(a) => a,
         };
 
-        let mut buf = vec![0; buf];
+        let mut buf = vec![0; u16::MAX as usize];
 
         tokio::select! {
             size = recv.read(&mut buf) => {
@@ -31,6 +32,8 @@ pub async fn handler(conn: Connecting, buf: usize, tx: Sender<Vec<u8>>) -> Resul
             }
         }
     }
+
+    println!("{} closed the connection", conn.remote_address());
 
     Ok(())
 }
