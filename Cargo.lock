@@ -904,7 +904,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a156c684c91ea7d62626509bce3cb4e1d9ed5c4d978f7b4352658f96a4c26b4a"
 
 [[package]]
-name = "voiceland-common"
+name = "voiceland_common"
 version = "0.1.0"
 dependencies = [
  "chrono",
@@ -912,7 +912,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "voiceland-core"
+name = "voiceland_core"
 version = "1.0.0"
 dependencies = [
  "anyhow",
@@ -924,8 +924,12 @@ dependencies = [
  "serde_yaml",
  "tokio",
  "ulid",
- "voiceland-common",
+ "voiceland_common",
 ]
+
+[[package]]
+name = "voiceland_protocol"
+version = "0.1.0"
 
 [[package]]
 name = "wasi"

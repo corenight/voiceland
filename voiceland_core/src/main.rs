@@ -6,10 +6,7 @@ use rustls::{Certificate, PrivateKey};
 use rustls_pemfile::{certs, pkcs8_private_keys, rsa_private_keys};
 use tokio::{fs, sync::broadcast};
 
-use config::{
-    config,
-    default::{self, QUIC_CONFIG},
-};
+use config::{config, default};
 use voiceland_common::logs;
 
 mod config;

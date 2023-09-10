@@ -1,8 +1,9 @@
 # Workspace members
 [workspace]
 members = [
-    "voiceland-core",
-    "voiceland-common"
+    "voiceland_core",
+    "voiceland_common",
+    "voiceland_protocol"
 ]
 resolver = "2"
 
@@ -18,4 +19,4 @@ anyhow = "1.0"
 ulid = "1"
 
 # Internal packages
-voiceland-common = { path = "./voiceland-common" }
+voiceland_common = { path = "./voiceland_common" }
