@@ -16,6 +16,7 @@ mod config;
 mod consts;
 mod handler;
 mod structs;
+mod utils;
 
 #[tokio::main]
 async fn main() {
@@ -39,6 +40,11 @@ async fn run() -> Result<()> {
     let config = config(Path::new(&path)).await?;
 
     logs::ok("Config loaded");
+
+    // Creating temp folder
+    fs::create_dir_all("/tmp/voiceland").await?;
+
+    logs::ok("Created /tmp/voiceland folder");
 
     // Set TLS configuration
     let server_cert: Vec<Certificate>;
@@ -88,20 +94,9 @@ async fn run() -> Result<()> {
     // Transport configuration
     let transport_config = Arc::get_mut(&mut server_config.transport).unwrap();
 
-    let quic_config = config.quic_conf.unwrap_or(QUIC_CONFIG);
-
-    transport_config.keep_alive_interval(Some(Duration::from_millis(
-        quic_config
-            .keep_alive_interval
-            .unwrap_or(default::KEEP_ALIVE_INTERVAL),
-    )));
+    transport_config.keep_alive_interval(Some(Duration::from_millis(default::KEEP_ALIVE_INTERVAL)));
     transport_config.max_idle_timeout(Some(
-        Duration::from_secs(
-            quic_config
-                .max_idle_timeout
-                .unwrap_or(default::MAX_IDLE_TIMEOUT),
-        )
-        .try_into()?,
+        Duration::from_millis(default::MAX_IDLE_TIMEOUT).try_into()?,
     ));
 
     logs::ok("QUIC socket configuration set");

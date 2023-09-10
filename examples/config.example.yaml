@@ -27,7 +27,7 @@ tls_cert:
 # QUIC configuration
 # 
 # This allows to set some Quinn options
-quic_conf:
+#quic_conf:
   # Keep alive interval (u64 - milliseconds)
   #
   # - This must be lower than `max_idle_timeout`

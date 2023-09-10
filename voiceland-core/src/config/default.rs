@@ -1,4 +1,4 @@
-use crate::structs::QuicConfiguration;
+use crate::structs::config::QuicConfiguration;
 
 // QUIC default
 pub const KEEP_ALIVE_INTERVAL: u64 = 5_000;
