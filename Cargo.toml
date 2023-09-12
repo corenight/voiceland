@@ -3,8 +3,10 @@
 members = [
     "voiceland_core",
     "voiceland_common",
-    "voiceland_protocol"
+    "voiceland_protocol",
+    "voiceland_internal_tests"
 ]
+default-members = ["voiceland_core"]
 resolver = "2"
 
 [workspace.dependencies]
@@ -17,6 +19,8 @@ serde = { version = "1.0", features = ["derive"] }
 serde_yaml = "0.9"
 anyhow = "1.0"
 ulid = "1"
+rsmpeg = { version = "0", features = ["ffmpeg6", "link_system_ffmpeg"] }
+
 
 # Internal packages
 voiceland_common = { path = "./voiceland_common" }

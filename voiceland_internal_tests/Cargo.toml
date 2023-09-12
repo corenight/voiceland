@@ -1,0 +1,8 @@
+[package]
+name = "voiceland_internal_tests"
+version = "1.0.0"
+edition = "2021"
+license = "AGPL-3.0"
+
+[dependencies]
+rsmpeg = { workspace = true }
