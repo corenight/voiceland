@@ -3,7 +3,7 @@ use std::ffi::CString;
 use rsmpeg::avcodec;
 use voiceland_protocol::{
     from_packet,
-    structs::{self, InputPacket},
+    structs::{self, Packet},
     to_packet,
 };
 
@@ -14,11 +14,11 @@ fn main() {
 
     println!("{:#?}", a.long_name());
 
-    let data = InputPacket {
+    let data = Packet {
         op: 0b1000000,
         payload: structs::Payload::ClientOpenPortal(structs::ClientOpenPortal {
             name: "larva".into(),
-            security: structs::AlgorithmNumber::ARIA,
+            security: structs::SecurityAlgNumber::ARIA,
             audio: structs::AudioClientOpenPortal {
                 codec: 12,
                 bitrate: 64000,

@@ -27,7 +27,7 @@ pub enum OpBitMask {
 /// This could change because I don't decided yet what library use for security.
 /// These algorithms are most important at RustCrypto
 #[derive(Debug, Serialize, Deserialize)]
-pub enum AlgorithmNumber {
+pub enum SecurityAlgNumber {
     // Symmetric
     ARIA,
     AES,
@@ -61,10 +61,21 @@ pub enum AlgorithmNumber {
     SM2,
 }
 
-/// Codec enum
+/// Compression algorithm
+/// TODO add more algorithms
+#[derive(Debug, Serialize, Deserialize)]
+pub enum CompressionAlgNumber {
+    ZSTD,
+    ZLIB,
+    BROTLI,
+    LZ77,
+    LZSS,
+    SNAPPY,
+    LZMA,
+    G711,
+}
 
 /// Data enum
-
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Payload {
     ClientOpenPortal(ClientOpenPortal),
@@ -98,8 +109,14 @@ pub struct ClientOpenPortal {
     /// 32 bytes
     pub name: String,
 
+    /// 128 bytes
+    pub description: String,
+
     /// u8
-    pub security: AlgorithmNumber,
+    pub security: SecurityAlgNumber,
+
+    // u8
+    pub compression: CompressionAlgNumber,
 
     /// Audio codec
     pub audio: AudioClientOpenPortal,
@@ -110,7 +127,7 @@ pub struct ClientOpenPortal {
 
 /// Parse to packet
 #[derive(Debug, Serialize, Deserialize)]
-pub struct InputPacket {
+pub struct Packet {
     pub op: u8,
     pub payload: Payload,
 }
