@@ -6,3 +6,4 @@ license = "AGPL-3.0"
 
 [dependencies]
 rsmpeg = { workspace = true }
+voiceland_protocol = { path = "../voiceland_protocol" }

@@ -1,4 +1,5 @@
-use 
+use rsmpeg::avcodec;
+use serde::{Deserialize, Serialize};
 
 /// Header bit mask
 pub enum OpBitMask {
@@ -14,17 +15,18 @@ pub enum OpBitMask {
     /// - 1: Payload is given
     PAYLOAD = 1 << 2,
 
-    B3 = 1 << 3,
-    B4 = 1 << 4,
-    B5 = 1 << 5,
-    B6 = 1 << 6,
-    B7 = 1 << 7,
+    OP0 = 1 << 3,
+    OP1 = 1 << 4,
+    OP2 = 1 << 5,
+    OP3 = 1 << 6,
+    OP4 = 1 << 7,
 }
 
 /// Security algorithms
 ///
 /// This could change because I don't decided yet what library use for security.
 /// These algorithms are most important at RustCrypto
+#[derive(Debug, Serialize, Deserialize)]
 pub enum AlgorithmNumber {
     // Symmetric
     ARIA,
@@ -62,31 +64,53 @@ pub enum AlgorithmNumber {
 /// Codec enum
 
 /// Data enum
+
+#[derive(Debug, Serialize, Deserialize)]
 pub enum Payload {
-    Op1JoinPortal,
+    ClientOpenPortal(ClientOpenPortal),
+    ClientJoinPortal(ClientJoinPortal),
 }
 
 /// CLIENT - Join a portal
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ClientJoinPortal {
     /// 26 bytes
-    id: String,
+    pub id: String,
+}
+
+/// Audio ClientOpenPortal struct
+#[derive(Debug, Serialize, Deserialize)]
+pub struct AudioClientOpenPortal {
+    pub codec: avcodec::AVCodecID,
+    pub bitrate: u64,
+}
+
+/// Audio ClientOpenPortal struct
+#[derive(Debug, Serialize, Deserialize)]
+pub struct VideoClientOpenPortal {
+    pub codec: avcodec::AVCodecID,
+    pub bitrate: u64,
 }
 
 /// CLIENT - Open a portal
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ClientOpenPortal {
     /// 32 bytes
-    name: String,
+    pub name: String,
 
     /// u8
-    security: AlgorithmNumber,
+    pub security: AlgorithmNumber,
 
     /// Audio codec
-    audio_codec: ,
-    audio_bitrate: 
+    pub audio: AudioClientOpenPortal,
+
+    /// Video codec
+    pub video: VideoClientOpenPortal,
 }
 
 /// Parse to packet
+#[derive(Debug, Serialize, Deserialize)]
 pub struct InputPacket {
-    op: u8,
-    payload: Payload,
+    pub op: u8,
+    pub payload: Payload,
 }

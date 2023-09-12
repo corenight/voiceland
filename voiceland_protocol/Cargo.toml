@@ -5,3 +5,7 @@ edition = "2021"
 license = "AGPL-3.0"
 
 [dependencies]
+rsmpeg = { workspace = true }
+serde = { workspace = true }
+anyhow = { workspace = true }
+bincode = "1"
