@@ -22,6 +22,17 @@ pub enum OpBitMask {
     OP4 = 1 << 7,
 }
 
+/// Operation bitmask definition
+pub enum BitMask {
+    // Stream
+    Stream = 0,
+
+    // Operation
+    Operation = 1 << 7,
+    CreatePortal,
+    JoinPortal,
+}
+
 /// Security algorithms
 ///
 /// This could change because I don't decided yet what library use for security.
@@ -76,40 +87,42 @@ pub enum CompressionAlgNumber {
 }
 
 /// Data enum
+///
+/// Enum names are marked as "<operation><0 - stream | 1 - operation><hex operation mask>
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Payload {
-    ClientOpenPortal(ClientOpenPortal),
-    ClientJoinPortal(ClientJoinPortal),
+    OpenPortal11(OpenPortal11),
+    JoinPortal12(JoinPortal12),
 }
 
 /// CLIENT - Join a portal
 #[derive(Debug, Serialize, Deserialize)]
-pub struct ClientJoinPortal {
+pub struct JoinPortal12 {
     /// 26 bytes
     pub id: String,
 }
 
 /// Audio ClientOpenPortal struct
 #[derive(Debug, Serialize, Deserialize)]
-pub struct AudioClientOpenPortal {
+pub struct Audio {
     pub codec: avcodec::AVCodecID,
     pub bitrate: u64,
 }
 
 /// Audio ClientOpenPortal struct
 #[derive(Debug, Serialize, Deserialize)]
-pub struct VideoClientOpenPortal {
+pub struct Video {
     pub codec: avcodec::AVCodecID,
     pub bitrate: u64,
 }
 
 /// CLIENT - Open a portal
 #[derive(Debug, Serialize, Deserialize)]
-pub struct ClientOpenPortal {
-    /// 32 bytes
+pub struct OpenPortal11 {
+    /// n + 1 bytes
     pub name: String,
 
-    /// 128 bytes
+    /// n + 1 bytes
     pub description: String,
 
     /// u8
@@ -119,10 +132,10 @@ pub struct ClientOpenPortal {
     pub compression: CompressionAlgNumber,
 
     /// Audio codec
-    pub audio: AudioClientOpenPortal,
+    pub audio: Audio,
 
     /// Video codec
-    pub video: VideoClientOpenPortal,
+    pub video: Video,
 }
 
 /// Parse to packet
