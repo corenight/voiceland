@@ -1,7 +1,9 @@
+use num_derive::{FromPrimitive, ToPrimitive};
 use rsmpeg::avcodec;
 use serde::{Deserialize, Serialize};
 
 /// Header bit mask
+#[derive(FromPrimitive, ToPrimitive)]
 pub enum OpBitMask {
     /// - 0: Data stream
     /// - 1: Operation stream
@@ -23,6 +25,7 @@ pub enum OpBitMask {
 }
 
 /// Operation bitmask definition
+#[derive(FromPrimitive, ToPrimitive)]
 pub enum BitMask {
     // Stream
     Stream = 0,
@@ -37,7 +40,7 @@ pub enum BitMask {
 ///
 /// This could change because I don't decided yet what library use for security.
 /// These algorithms are most important at RustCrypto
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, FromPrimitive, ToPrimitive)]
 pub enum SecurityAlgNumber {
     // Symmetric
     ARIA,
@@ -74,7 +77,7 @@ pub enum SecurityAlgNumber {
 
 /// Compression algorithm
 /// TODO add more algorithms
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, FromPrimitive, ToPrimitive)]
 pub enum CompressionAlgNumber {
     ZSTD,
     ZLIB,

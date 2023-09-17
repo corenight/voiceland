@@ -8,4 +8,6 @@ license = "AGPL-3.0"
 rsmpeg = { workspace = true }
 serde = { workspace = true }
 anyhow = { workspace = true }
-bincode = "1"
+
+num-traits = "0.2"
+num-derive = "0.4"

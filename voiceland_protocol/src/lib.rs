@@ -2,8 +2,8 @@
 //! This module receives Voiceland packets and parses it, reading operation header and parsing required data for each operation.
 
 use anyhow::{bail, Result};
-use bincode;
 
+use num_traits::FromPrimitive;
 use structs::Packet;
 
 mod serializers;
@@ -18,15 +18,18 @@ pub fn from_packet(input: &mut Vec<u8>) -> Result<Packet> {
         bail!("No data given.")
     }
 
-    // Stream
+    // TODO Stream
     if input[0] | 1 << 7 == 0 {
         bail!("Not supported yet")
     }
     // Operations
     else {
-        let data = match input[0] as structs::BitMask {
-            structs::BitMask::CreatePortal => serializers::open_portal_11(&mut input)?,
-            _ => bail!("Unknown operation"),
+        let data = match FromPrimitive::from_u8(input[0]) {
+            Some(a) => match a {
+                structs::BitMask::CreatePortal => serializers::open_portal_11(input)?,
+                _ => bail!("Unknown operation"),
+            },
+            None => bail!("Cannot parse bit mask"),
         };
 
         Ok(data)
