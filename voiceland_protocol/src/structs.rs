@@ -3,6 +3,7 @@ use rsmpeg::avcodec;
 use serde::{Deserialize, Serialize};
 
 /// Header bit mask
+#[repr(u8)]
 #[derive(FromPrimitive, ToPrimitive)]
 pub enum OpBitMask {
     /// - 0: Data stream
@@ -17,8 +18,8 @@ pub enum OpBitMask {
     /// - 1: Payload is given
     PAYLOAD = 1 << 2,
 
-    OP0 = 1 << 3,
     OP1 = 1 << 4,
+    OP0 = 1 << 3,
     OP2 = 1 << 5,
     OP3 = 1 << 6,
     OP4 = 1 << 7,
@@ -26,6 +27,7 @@ pub enum OpBitMask {
 
 /// Operation bitmask definition
 #[derive(FromPrimitive, ToPrimitive)]
+#[repr(u8)]
 pub enum BitMask {
     // Stream
     Stream = 0,
@@ -40,6 +42,7 @@ pub enum BitMask {
 ///
 /// This could change because I don't decided yet what library use for security.
 /// These algorithms are most important at RustCrypto
+#[repr(u8)]
 #[derive(Debug, Serialize, Deserialize, FromPrimitive, ToPrimitive)]
 pub enum SecurityAlgNumber {
     // Symmetric
@@ -77,6 +80,7 @@ pub enum SecurityAlgNumber {
 
 /// Compression algorithm
 /// TODO add more algorithms
+#[repr(u8)]
 #[derive(Debug, Serialize, Deserialize, FromPrimitive, ToPrimitive)]
 pub enum CompressionAlgNumber {
     ZSTD,
@@ -92,6 +96,7 @@ pub enum CompressionAlgNumber {
 /// Data enum
 ///
 /// Enum names are marked as "<operation><0 - stream | 1 - operation><hex operation mask>
+#[repr(u8)]
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Payload {
     OpenPortal11(OpenPortal11),

@@ -1,7 +1,10 @@
 use anyhow::{bail, Result};
 use num_traits::{FromPrimitive, ToPrimitive};
 
-use crate::structs::{self, CompressionAlgNumber, SecurityAlgNumber};
+use crate::{
+    structs::{self, CompressionAlgNumber, SecurityAlgNumber},
+    utils,
+};
 
 /// Operation - Open portal
 ///
@@ -19,11 +22,17 @@ pub fn open_portal_11(buf: &mut Vec<u8>) -> Result<structs::Packet> {
 
     let mut buffer = buf.split(|a| a == &10u8);
 
-    let mut name = String::from_utf8_lossy(&buffer.next().unwrap().to_vec()).to_string();
-    let mut description = String::from_utf8_lossy(&buffer.next().unwrap().to_vec()).to_string();
+    let name = String::from_utf8_lossy(&buffer.next().unwrap().to_vec()).to_string();
+    let description = String::from_utf8_lossy(&buffer.next().unwrap().to_vec()).to_string();
 
-    let [security, compression, audio_codec @ 4, video_codec @ 4, audio_bitrate @ 4, video_bitrate @ 4] =
-        buffer.next().unwrap();
+    let data = buffer.next().unwrap();
+
+    let security: SecurityAlgNumber = unsafe { std::mem::transmute(data[0]) };
+    let compression: CompressionAlgNumber = unsafe { std::mem::transmute(data[1]) };
+    let audio_codec = utils::to_u32(data[2..=5].try_into()?)?;
+    let video_codec = utils::to_u16(data[6..=7].try_into()?)?;
+    let audio_bitrate = utils::to_u64(data[8..=11].try_into()?)?;
+    let video_bitrate = utils::to_u64(data[12..=15].try_into()?)?;
 
     let security: SecurityAlgNumber = unsafe { std::mem::transmute(security) };
     let compression: CompressionAlgNumber = unsafe { std::mem::transmute(compression) };
@@ -40,7 +49,7 @@ pub fn open_portal_11(buf: &mut Vec<u8>) -> Result<structs::Packet> {
                 bitrate: audio_bitrate,
             },
             video: structs::Video {
-                codec: video_codec,
+                codec: video_codec as u32,
                 bitrate: video_bitrate,
             },
         }),
