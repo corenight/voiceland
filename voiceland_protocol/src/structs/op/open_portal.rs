@@ -1,4 +1,4 @@
-use crate::structs::algs::{Compression, Security};
+use crate::structs::algo::{Compression, Security};
 
 /// CLIENT REQUEST - Open a portal
 pub struct Request {
