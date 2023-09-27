@@ -5,6 +5,7 @@ I need to have a better algorithm list
 */
 
 #[repr(u8)]
+#[derive(Clone, Copy)]
 pub enum Security {
     /// None
     NONE = 0,
@@ -50,6 +51,7 @@ pub enum Security {
 // This could be useless since there's already audio codecs that compress the audio.
 // Anyway I'll give it a chance. If is not practical, I'll remove it.
 #[repr(u8)]
+#[derive(Clone, Copy)]
 pub enum Compression {
     /// None
     NONE = 0,
