@@ -1,22 +1,43 @@
 use std::ffi::CString;
 
-use rsmpeg::avcodec;
+use voiceland_protocol::structs::packet::Packet;
 
-use voiceland_protocol::{
+// use rsmpeg::avcodec;
+
+/* use voiceland_protocol::{
     from_packet,
     structs::{self, Packet},
-};
+}; */
 
 mod packet_gen;
 
 fn main() {
-    let name = "libopus";
+    let a = voiceland_protocol::parser::open_portal::serialize_request(
+        &mut voiceland_protocol::structs::op::open_portal::Request {
+            name: "Larva fresca".into(),
+            description: "Hello I like sasilla frescota and bugs".into(),
+            security: voiceland_protocol::structs::algo::Security::ARIA,
+            compression: voiceland_protocol::structs::algo::Compression::BROTLI,
+            audio: voiceland_protocol::structs::op::open_portal::Audio {
+                codec: (86_028u32 - 50_000u32) as u16,
+                bitrate: 256_000,
+            },
+            video: voiceland_protocol::structs::op::open_portal::Video {
+                codec: 167,
+                bitrate: 1_000_000,
+            },
+        },
+    );
+
+    println!("{:?}", a)
+
+    /* let name = "libopus";
 
     let a = avcodec::AVCodec::find_encoder_by_name(&CString::new(name).unwrap()).unwrap();
 
-    println!("{:#?}", a.long_name());
+    println!("{:#?}", a.long_name()); */
 
-    let data = Packet {
+    /* let data = Packet {
         op: 0b1000000,
         payload: structs::Payload::OpenPortal11(structs::OpenPortal11 {
             name: "larva".into(),
@@ -48,7 +69,7 @@ fn main() {
     };
 
     println!("{:#?}", packet);
-    println!("{}", data.name);
+    println!("{}", data.name); */
 
     /*let bitos = from_packet(data).unwrap(); // Hello I like sasilla frescota and bugs
 

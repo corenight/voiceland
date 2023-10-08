@@ -1,4 +1,4 @@
-use crate::structs::op::open_portal::Request;
+use crate::structs::op::open_portal::{Request, Response};
 
 pub fn serialize_request(payload: &mut Request) -> Vec<u8> {
     let mut packet: Vec<u8> = vec![];
@@ -19,4 +19,9 @@ pub fn serialize_request(payload: &mut Request) -> Vec<u8> {
     packet.extend_from_slice(&u32::to_le_bytes(payload.video.bitrate));
 
     packet
+}
+
+pub fn serialize_response(payload: &mut Response) -> Vec<u8> {
+    payload.id.push('\n');
+    payload.id.as_bytes().to_vec()
 }

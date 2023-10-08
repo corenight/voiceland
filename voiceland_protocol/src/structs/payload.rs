@@ -6,7 +6,7 @@ use super::op;
 #[repr(u8)]
 pub enum PayloadRequest {
     OpenPortal11(op::open_portal::Request) = 1 << 7,
-    JoinPortal12(op::join_portal::Request) = (1 << 7) + 1,
+    JoinPortal12(op::join_portal::Response) = (1 << 7) + 1,
 }
 
 #[repr(u8)]
