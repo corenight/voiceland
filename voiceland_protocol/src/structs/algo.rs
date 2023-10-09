@@ -15,8 +15,8 @@ pub enum Security {
     KYBER,          // https://github.com/Argyle-Software/kyber
     CURVE25519,     // https://github.com/dalek-cryptography/curve25519-dalek
     RSA,            // https://github.com/RustCrypto/RSA
-    BIGNCURVE256V1, // https://github.com/RustCrypto/elliptic-curves/tree/master/bign256
     SECP256K1,      // https://github.com/RustCrypto/elliptic-curves/blob/master/k256
+    BIGNCURVE256V1, // https://github.com/RustCrypto/elliptic-curves/tree/master/bign256
     NISTP192,       // https://github.com/RustCrypto/elliptic-curves/blob/master/p192
     NISTP224,       // https://github.com/RustCrypto/elliptic-curves/blob/master/p224
     NISTP256,       // https://github.com/RustCrypto/elliptic-curves/blob/master/p256
