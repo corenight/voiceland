@@ -90,8 +90,10 @@ async fn main() -> Result<()> {
 
     match op {
         "recv" => loop {
-            let (_, mut recv) = conn.open_bi().await.unwrap();
+            let (mut send, mut recv) = conn.open_bi().await.unwrap();
             let mut buf = vec![0; u16::MAX as usize];
+
+            send.write(b"").await?;
 
             let size = recv.read(&mut buf).await;
 
@@ -111,7 +113,7 @@ async fn main() -> Result<()> {
             let (mut send, _) = conn.open_bi().await.unwrap();
             let input = inquire::Text::new("Message").prompt().unwrap();
 
-            send.write(input.as_bytes()).await.unwrap();
+            send.write(input.as_bytes()).await?;
         },
         _ => panic!("larva"),
     }

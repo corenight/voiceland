@@ -1,9 +1,11 @@
 use anyhow::{bail, Result};
+use futures::stream::FuturesUnordered;
 use quinn::{Connecting, ConnectionError};
 use tokio::sync::broadcast::Sender;
+use voiceland_common::logs;
 
 pub async fn handler(conn: Connecting, tx: Sender<Vec<u8>>) -> Result<()> {
-    let conn = conn.await?;
+    /* let conn = conn.await?;
 
     let mut rx = tx.subscribe();
 
@@ -18,33 +20,53 @@ pub async fn handler(conn: Connecting, tx: Sender<Vec<u8>>) -> Result<()> {
 
         let mut buf = vec![0; u16::MAX as usize];
 
-        tokio::select! {
-            size = recv.read(&mut buf) => {
-                let buf_size = match size {
-                    Err(err) => bail!(err),
-                    Ok(n) => match n {
-                        None => break,
-                        Some(m) => m
-                    }
-                };
+        let tasks = FuturesUnordered::new();
 
-                buf.resize(buf_size, 0);
+        tasks.push({
+            let size = recv.read(&mut buf).await;
 
-                println!("[ RECV ] {}", String::from_utf8_lossy(&buf));
+            let size = match size {
+                Err(err) => bail!(err),
+                Ok(n) => match n {
+                    None => break,
+                    Some(m) => m,
+                },
+            };
 
-                tx.send(buf)?;
+            buf.resize(size, 0);
+
+            println!("[ RECV ] {}", String::from_utf8_lossy(&buf));
+
+            tx.send(buf)?;
+        });
+
+        tasks.push({
+            let msg = rx.recv().await;
+
+            if let Ok(msg) = msg {
+                println!("[ MPMC ] {}", String::from_utf8_lossy(&msg));
+                send.write(msg.as_slice()).await?;
             }
-
-            msg = rx.recv() => {
-                if let Ok(msg) = msg {
-                    println!("[ MPMC ] {}", String::from_utf8_lossy(&msg));
-                    //send.write(msg.as_slice()).await?;
-                }
-            }
-        };
+        });
     }
 
-    println!("{} closed the connection", conn.remote_address());
+    logs::info(format!("{} closed the connection", conn.remote_address()));
+
+    Ok(()) */
+
+    let conn = conn.await?;
+
+    let mut rx = tx.subscribe();
+
+    tx.send(b"larva".to_vec())?;
+
+    tokio::select! {
+        msg = rx.recv() => {
+            if let Ok(msg) = msg {
+                println!("[ MPMC ] {}", String::from_utf8_lossy(&msg));
+            }
+        }
+    }
 
     Ok(())
 }
