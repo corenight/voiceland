@@ -1,0 +1,15 @@
+[package]
+name = "voiceland_cli"
+version = "1.0.0"
+edition = "2021"
+
+
+[dependencies]
+quinn = { workspace = true }
+rustls = { workspace = true }
+tokio = { workspace = true }
+anyhow = { workspace = true }
+
+voiceland_common = { workspace = true }
+
+inquire = "0"

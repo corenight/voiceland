@@ -109,7 +109,7 @@ async fn run() -> Result<()> {
 
     // Socket broadcast
     // TODO This needs to be restructured
-    let (tx, _) = broadcast::channel(u8::MAX as usize);
+    let (tx, _) = broadcast::channel::<Vec<u8>>(u8::MAX as usize);
 
     // Connection handler
     while let Some(conn) = endpoint.accept().await {

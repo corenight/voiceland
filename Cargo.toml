@@ -4,6 +4,7 @@ members = [
     "voiceland_core",
     "voiceland_common",
     "voiceland_protocol",
+    "voiceland_cli",
     "voiceland_internal_tests",
 ]
 default-members = ["voiceland_core"]
