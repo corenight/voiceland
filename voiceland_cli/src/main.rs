@@ -37,54 +37,11 @@ async fn main() -> Result<()> {
         .with_no_client_auth();
 
     let config = quinn::ClientConfig::new(Arc::new(tls_config));
-    //let config = quinn::ClientConfig::with_native_roots();
 
     let mut endpoint = Endpoint::client("[::]:0".parse()?)?;
     endpoint.set_default_client_config(config);
 
     let conn = endpoint.connect(addr.parse()?, "voiceland")?.await?;
-
-    // let (tx, _) = tokio::sync::broadcast::channel::<String>(u8::MAX as usize);
-
-    /* let tx_thr = tx.clone();
-    tokio::spawn(async move {
-        let mut rx = tx_thr.subscribe();
-        loop {
-            let mut buf = vec![0; u16::MAX as usize];
-
-            let (mut send, mut recv) = conn.open_bi().await.unwrap();
-
-            tokio::select! {
-                msg = rx.recv()  => {
-                    send.write(msg.unwrap().as_bytes()).await.unwrap();
-                },
-
-
-            size = recv.read(&mut buf) => {
-                let buf_size = match size {
-                    Err(err) => panic!("{}", err),
-                    Ok(n) => match n {
-                        None => break,
-                        Some(m) => m
-                    }
-                };
-
-                buf.resize(buf_size, 0);
-
-                println!("{}", String::from_utf8_lossy(&buf));
-            }
-            }
-
-            let res = recv.read_to_end(usize::MAX).await.unwrap();
-            println!("Server dijo:: {}", String::from_utf8_lossy(&res));
-        }
-    });
-
-    loop {
-        let input = inquire::Text::new("Message").prompt().unwrap();
-
-        tx.send(input)?;
-    } */
 
     let op = inquire::Select::new("Client mode", vec!["send", "recv"]).prompt()?;
 
