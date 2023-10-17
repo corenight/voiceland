@@ -43,14 +43,37 @@ async fn main() -> Result<()> {
 
     let conn = endpoint.connect(addr.parse()?, "voiceland")?.await?;
 
-    let op = inquire::Select::new("Client mode", vec!["send", "recv"]).prompt()?;
+    loop {
+        let (mut send, mut recv) = conn.open_bi().await.unwrap();
+
+        tokio::spawn(async move {
+            let mut buf = vec![0; u16::MAX as usize];
+
+            let size = recv.read(&mut buf).await;
+
+            let buf_size = match size {
+                Err(err) => panic!("{}", err),
+                Ok(n) => match n {
+                    None => return,
+                    Some(m) => m,
+                },
+            };
+
+            buf.resize(buf_size, 0);
+
+            println!("{}", String::from_utf8_lossy(&buf));
+        });
+
+        let input = inquire::Text::new("Message").prompt().unwrap();
+
+        send.write(input.as_bytes()).await?;
+    }
+    /* let op = inquire::Select::new("Client mode", vec!["send", "recv"]).prompt()?;
 
     match op {
         "recv" => loop {
             let (mut send, mut recv) = conn.open_bi().await.unwrap();
             let mut buf = vec![0; u16::MAX as usize];
-
-            send.write(b"").await?;
 
             let size = recv.read(&mut buf).await;
 
@@ -73,7 +96,7 @@ async fn main() -> Result<()> {
             send.write(input.as_bytes()).await?;
         },
         _ => panic!("larva"),
-    }
+    } */
 
     Ok(())
 }

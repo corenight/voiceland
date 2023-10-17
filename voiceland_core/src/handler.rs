@@ -1,5 +1,7 @@
+use std::pin::Pin;
+
 use anyhow::{bail, Result};
-use futures::{stream::FuturesUnordered, StreamExt};
+use futures::{stream::FuturesUnordered, Future, StreamExt};
 use quinn::{Connecting, ConnectionError, RecvStream, SendStream};
 use tokio::sync::broadcast::Sender;
 use voiceland_common::logs;
@@ -18,7 +20,7 @@ pub async fn handler(conn: Connecting, tx: Sender<Vec<u8>>) -> Result<()> {
             Ok(a) => a,
         };
 
-        /*let mut buf = vec![0; u16::MAX as usize];
+        /* let mut buf = vec![0; u16::MAX as usize];
         tokio::select! {
             msg = rx.recv() => {
                 if let Ok(msg) = msg {
@@ -50,23 +52,25 @@ pub async fn handler(conn: Connecting, tx: Sender<Vec<u8>>) -> Result<()> {
             _ = socket(tx.clone(), &mut recv) => {}
         } */
 
-        /* let tasks = FuturesUnordered::new();
+        /* let mut tasks = FuturesUnordered::<Pin<Box<dyn Future<Output = Result<()>> + Send>>>::new();
 
-        tasks.push(broadcast(tx.clone(), &mut send).await);
-        tasks.push(socket(tx.clone(), &mut recv).await);
+        tasks.push(Box::pin(broadcast(tx.clone(), &mut send)));
+        tasks.push(Box::pin(socket(tx.clone(), &mut recv)));
 
-        tasks.iter(); */
+         while let Some(Err(err)) = tasks.next().await {
+            panic!("{}", err)
+        } */
 
         let tx1 = tx.clone();
         let tx2 = tx.clone();
         tokio::spawn(async move {
-            if let Err(err) = broadcast(tx1.clone(), &mut send).await {
-                logs::error(err)
+            if let Err(err) = broadcast(tx1, &mut send).await {
+                panic!("{}", err)
             }
         });
         tokio::spawn(async move {
-            if let Err(err) = socket(tx2.clone(), &mut recv).await {
-                logs::error(err)
+            if let Err(err) = socket(tx2, &mut recv).await {
+                panic!("{}", err)
             }
         });
     }
