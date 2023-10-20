@@ -19,23 +19,30 @@ pub async fn handler(conn: Connecting, tx: Sender<Vec<u8>>) -> Result<()> {
         Ok(a) => a,
     };
 
-    println!("{:#?}", conn.handshake_data());
-
     loop {
         let mut buf = vec![0; u16::MAX as usize];
 
-        let len = match recv.read(&mut buf).await? {
-            None => break,
-            Some(a) => a,
-        };
+        tokio::select! {
+            len = recv.read(&mut buf) => {
+                let len = match len? {
+                    None => break,
+                    Some(a) => a,
+                };
 
-        buf.resize(len, 0);
+                buf.resize(len, 0);
 
-        println!("{}", String::from_utf8_lossy(&buf));
+                println!("[ QUIC ] {}", String::from_utf8_lossy(&buf));
 
-        buf.reverse();
+                tx.send(buf)?;
+            }
 
-        send.write(buf.as_slice()).await.unwrap();
+            msg = rx.recv() => {
+                if let Ok(msg) = msg {
+                    println!("[  RX  ] {}", String::from_utf8_lossy(&msg));
+                    send.write(&msg).await?;
+                }
+            }
+        }
     }
 
     Ok(())
