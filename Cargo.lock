@@ -1090,7 +1090,7 @@ checksum = "a156c684c91ea7d62626509bce3cb4e1d9ed5c4d978f7b4352658f96a4c26b4a"
 
 [[package]]
 name = "voiceland_cli"
-version = "1.0.0"
+version = "0.1.0"
 dependencies = [
  "anyhow",
  "inquire",
@@ -1110,7 +1110,7 @@ dependencies = [
 
 [[package]]
 name = "voiceland_core"
-version = "1.0.0"
+version = "0.1.0"
 dependencies = [
  "anyhow",
  "futures",
@@ -1127,14 +1127,14 @@ dependencies = [
 
 [[package]]
 name = "voiceland_internal_tests"
-version = "1.0.0"
+version = "0.1.0"
 dependencies = [
  "voiceland_protocol",
 ]
 
 [[package]]
 name = "voiceland_protocol"
-version = "1.0.0"
+version = "0.1.0"
 dependencies = [
  "anyhow",
 ]
