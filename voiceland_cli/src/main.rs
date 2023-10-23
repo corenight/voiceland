@@ -69,6 +69,4 @@ async fn main() -> Result<()> {
 
         send.write(input.as_bytes()).await?;
     }
-
-    Ok(())
 }

@@ -111,12 +111,18 @@ async fn run() -> Result<()> {
     // TODO This needs to be restructured
     let (tx, _) = broadcast::channel::<Vec<u8>>(u16::MAX as usize);
 
+    // Notify to threads a new connection with it's operation
+    // 0x00 -> open uni stream due to new connection
+    // 0x01 -> close uni stream because connection left
+    let (tx_join, _) = broadcast::channel::<u8>(u16::MAX as usize);
+
     // Connection handler
     while let Some(conn) = endpoint.accept().await {
         let tx = tx.clone();
+        let tx_join = tx_join.clone();
 
         tokio::spawn(async move {
-            if let Err(err) = handler::handler(conn, tx).await {
+            if let Err(err) = handler::handler(conn, tx, tx_join).await {
                 logs::error(err);
             }
         });

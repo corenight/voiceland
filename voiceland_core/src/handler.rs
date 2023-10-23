@@ -1,48 +1,68 @@
-use std::pin::Pin;
-
 use anyhow::{bail, Result};
-use futures::{stream::FuturesUnordered, Future, StreamExt};
-use quinn::{Connecting, ConnectionError, RecvStream, SendStream};
+use quinn::{Connecting, Connection, ConnectionError, RecvStream, SendStream};
 use tokio::sync::broadcast::{Receiver, Sender};
-use voiceland_common::logs;
 
-pub async fn handler(conn: Connecting, tx: Sender<Vec<u8>>) -> Result<()> {
+pub async fn handler(conn: Connecting, tx: Sender<Vec<u8>>, tx_join: Sender<u8>) -> Result<()> {
     let conn = conn.await?;
 
-    let mut rx = tx.subscribe();
+    tokio::spawn(async move {});
 
-    let (mut send, mut recv) = match conn.accept_bi().await {
+    Ok(())
+
+    /* let (mut send, mut recv) = match conn.accept_bi().await {
         Err(ConnectionError::ApplicationClosed { .. })
         | Err(ConnectionError::ConnectionClosed { .. })
         | Err(ConnectionError::TimedOut { .. }) => return Ok(()),
-        Err(err) => bail!(err),
+        Err(err) => {
+            bail!(err)
+        }
         Ok(a) => a,
     };
 
+    let mut rx = tx.subscribe();
+
     loop {
-        let mut buf = vec![0; u16::MAX as usize];
-
         tokio::select! {
-            len = recv.read(&mut buf) => {
-                let len = match len? {
-                    None => break,
-                    Some(a) => a,
-                };
-
-                buf.resize(len, 0);
-
-                println!("[ QUIC ] {}", String::from_utf8_lossy(&buf));
-
-                tx.send(buf)?;
-            }
-
-            msg = rx.recv() => {
-                if let Ok(msg) = msg {
-                    println!("[  RX  ] {}", String::from_utf8_lossy(&msg));
-                    send.write(&msg).await?;
-                }
-            }
+            _ = socket(&mut recv, &tx) => {}
+            _ = broadcast(&mut rx, &mut send) => {}
         }
+    } */
+}
+
+async fn socket(conn: Connection, tx: &Sender<Vec<u8>>, tx_join: Sender<u8>) -> Result<()> {
+    let mut recv = match conn.accept_uni().await {
+        Err(ConnectionError::ApplicationClosed { .. })
+        | Err(ConnectionError::ConnectionClosed { .. })
+        | Err(ConnectionError::TimedOut { .. }) => panic!("Nada, se ha cerrado la conn"),
+        Err(err) => panic!("{}", err),
+        Ok(a) => a,
+    };
+
+    tx_join.send(0x0)?;
+
+    let mut buf = vec![0; u16::MAX as usize];
+
+    let len = recv.read(&mut buf).await?;
+
+    let len = match len {
+        None => return Ok(()),
+        Some(a) => a,
+    };
+
+    buf.resize(len, 0);
+
+    println!("[ QUIC ] {}", String::from_utf8_lossy(&buf));
+
+    tx.send(buf)?;
+    Ok(())
+}
+
+async fn broadcast(rx: &mut Receiver<Vec<u8>>, send: &mut SendStream) -> Result<()> {
+    let msg = rx.recv().await;
+
+    if let Ok(msg) = msg {
+        println!("[  RX  ] {}", String::from_utf8_lossy(&msg));
+        send.write(&msg).await?;
     }
 
     Ok(())
