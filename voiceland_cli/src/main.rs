@@ -43,7 +43,9 @@ async fn main() -> Result<()> {
 
     let conn = endpoint.connect(addr.parse()?, "voiceland")?.await?;
 
-    let (mut send, mut recv) = conn.open_bi().await.unwrap();
+    let mut send = conn.open_uni().await?;
+
+    /* let (mut send, mut recv) = conn.open_bi().await.unwrap();
     tokio::spawn(async move {
         loop {
             let mut buf = vec![0; u16::MAX as usize];
@@ -62,11 +64,13 @@ async fn main() -> Result<()> {
 
             println!("\n{}\n", String::from_utf8_lossy(&buf));
         }
-    });
+    }); */
 
     loop {
         let input = inquire::Text::new("Message").prompt().unwrap();
 
         send.write(input.as_bytes()).await?;
     }
+
+    Ok(())
 }
