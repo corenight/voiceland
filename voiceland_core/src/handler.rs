@@ -50,25 +50,6 @@ pub async fn handler(conn: Connecting, tx: Sender<Vec<u8>>, tx_join: Sender<u8>)
     }
 
     Ok(())
-
-    /* let (mut send, mut recv) = match conn.accept_bi().await {
-        Err(ConnectionError::ApplicationClosed { .. })
-        | Err(ConnectionError::ConnectionClosed { .. })
-        | Err(ConnectionError::TimedOut { .. }) => return Ok(()),
-        Err(err) => {
-            bail!(err)
-        }
-        Ok(a) => a,
-    };
-
-    let mut rx = tx.subscribe();
-
-    loop {
-        tokio::select! {
-            _ = socket(&mut recv, &tx) => {}
-            _ = broadcast(&mut rx, &mut send) => {}
-        }
-    } */
 }
 
 async fn socket(recv: &mut RecvStream, tx: &Sender<Vec<u8>>, tx_join: &Sender<u8>) -> Result<()> {
