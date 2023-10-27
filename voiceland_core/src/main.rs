@@ -1,6 +1,7 @@
 use std::{env, path::Path, process::exit, sync::Arc, time::Duration};
 
 use anyhow::{bail, Result};
+use multiverse::Multiverse;
 use quinn::Endpoint;
 use rustls::{Certificate, PrivateKey};
 use rustls_pemfile::{certs, pkcs8_private_keys, rsa_private_keys};
@@ -12,8 +13,8 @@ use voiceland_common::logs;
 mod config;
 mod consts;
 mod handler;
+mod multiverse;
 mod structs;
-mod utils;
 
 #[tokio::main]
 async fn main() {
@@ -107,21 +108,18 @@ async fn run() -> Result<()> {
         endpoint.local_addr()?
     ));
 
-    tokio::spawn(async move {
-        if let Err(err) = handler::handler(conn, tx, tx_join).await {
-            logs::error(err);
-        }
-    });
+    let mut multiverse = Multiverse::new();
 
-    // Connection handler
-    while let Some(conn) = endpoint.accept().await {
-        let tx = tx.clone();
-        let tx_join = tx_join.clone();
+    while let Some(mut conn) = endpoint.accept().await {
+        multiverse.add(conn.remote_address());
 
+        let mut multiverse = multiverse.clone();
         tokio::spawn(async move {
-            if let Err(err) = handler::handler(conn, tx, tx_join).await {
+            if let Err(err) = handler::init(&mut conn, &mut multiverse).await {
                 logs::error(err);
             }
+
+            multiverse.rm(conn.remote_address()); // Check quinn/src/connection.rs:165
         });
     }
 
