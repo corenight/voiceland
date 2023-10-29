@@ -43,9 +43,11 @@ async fn main() -> Result<()> {
 
     let conn = endpoint.connect(addr.parse()?, "voiceland")?.await?;
 
-    let mut send = conn.open_uni().await?;
+    let (mut send, mut recv) = conn.open_bi().await.unwrap();
 
-    /* let (mut send, mut recv) = conn.open_bi().await.unwrap();
+    // This sends a packet to notify server that stream has been opened
+    send.write(b"").await?;
+
     tokio::spawn(async move {
         loop {
             let mut buf = vec![0; u16::MAX as usize];
@@ -62,9 +64,11 @@ async fn main() -> Result<()> {
 
             buf.resize(buf_size, 0);
 
-            println!("\n{}\n", String::from_utf8_lossy(&buf));
+            println!("{}", String::from_utf8_lossy(&buf));
         }
-    }); */
+    });
+
+    // let mut send = conn.open_uni().await?;
 
     loop {
         let input = inquire::Text::new("Message").prompt().unwrap();

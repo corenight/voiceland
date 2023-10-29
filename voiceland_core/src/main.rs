@@ -1,7 +1,6 @@
-use std::{env, path::Path, process::exit, sync::Arc, time::Duration};
+use std::{env, net::SocketAddr, path::Path, process::exit, sync::Arc, time::Duration};
 
 use anyhow::{bail, Result};
-use multiverse::Multiverse;
 use quinn::Endpoint;
 use rustls::{Certificate, PrivateKey};
 use rustls_pemfile::{certs, pkcs8_private_keys, rsa_private_keys};
@@ -108,18 +107,15 @@ async fn run() -> Result<()> {
         endpoint.local_addr()?
     ));
 
-    let mut multiverse = Multiverse::new();
+    let (tx, _) = broadcast::channel::<(SocketAddr, Vec<u8>)>(u16::MAX as usize);
 
     while let Some(mut conn) = endpoint.accept().await {
-        multiverse.add(conn.remote_address());
+        let mut multiverse = tx.clone();
 
-        let mut multiverse = multiverse.clone();
         tokio::spawn(async move {
             if let Err(err) = handler::init(&mut conn, &mut multiverse).await {
                 logs::error(err);
             }
-
-            multiverse.rm(conn.remote_address()); // Check quinn/src/connection.rs:165
         });
     }
 
