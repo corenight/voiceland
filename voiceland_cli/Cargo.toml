@@ -13,3 +13,4 @@ anyhow = { workspace = true }
 voiceland_common = { workspace = true }
 
 inquire = "0"
+cpal = "0"

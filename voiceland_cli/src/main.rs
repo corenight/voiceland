@@ -1,6 +1,14 @@
-use std::sync::Arc;
+// PLEASE
+// Ignore the code. Is messy but it works.
+// Is just a weird test.
+
+use std::{
+    sync::{mpsc, Arc},
+    time::Duration,
+};
 
 use anyhow::Result;
+use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use quinn::Endpoint;
 
 struct SkipServerVerification;
@@ -27,9 +35,7 @@ impl rustls::client::ServerCertVerifier for SkipServerVerification {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    // input
-
-    let addr = "[::1]:6050"; //inquire::Text::new("Server address").prompt()?;
+    let addr = "127.0.0.1:6050"; //inquire::Text::new("Server address").prompt()?;
 
     let tls_config = rustls::ClientConfig::builder()
         .with_safe_defaults()
@@ -41,6 +47,19 @@ async fn main() -> Result<()> {
     let mut endpoint = Endpoint::client("[::]:0".parse()?)?;
     endpoint.set_default_client_config(config);
 
+    /***********************************/
+
+    let host = cpal::default_host();
+
+    let input = host.default_input_device().unwrap();
+    let output = host.default_output_device().unwrap();
+
+    let config: cpal::StreamConfig = input.default_input_config().unwrap().into();
+
+    let err = |err: cpal::StreamError| panic!("{}", err);
+
+    /***********************************/
+
     let conn = endpoint.connect(addr.parse()?, "voiceland")?.await?;
 
     let (mut send, mut recv) = conn.open_bi().await.unwrap();
@@ -48,10 +67,11 @@ async fn main() -> Result<()> {
     // This sends a packet to notify server that stream has been opened
     send.write(b"").await?;
 
+    let (mut recv_tx, mut recv_rx) = mpsc::channel::<Vec<u8>>();
+
     tokio::spawn(async move {
         loop {
             let mut buf = vec![0; u16::MAX as usize];
-
             let size = recv.read(&mut buf).await;
 
             let buf_size = match size {
@@ -64,16 +84,48 @@ async fn main() -> Result<()> {
 
             buf.resize(buf_size, 0);
 
-            println!("{}", String::from_utf8_lossy(&buf));
+            recv_tx.send(buf.clone()).unwrap();
         }
     });
 
-    // let mut send = conn.open_uni().await?;
+    /***********************************/
+
+    let output_stream = output
+        .build_output_stream(
+            &config,
+            move |data: &mut [u8], _: &cpal::OutputCallbackInfo| {
+                let mut broma = recv_rx.recv().unwrap();
+                for sample in data {
+                    *sample = broma.pop().unwrap_or(0);
+                }
+            },
+            err,
+            None,
+        )
+        .unwrap();
+
+    let (mut send_tx, mut send_rx) = mpsc::channel::<Vec<u8>>();
+
+    let input_stream = input
+        .build_input_stream(
+            &config,
+            move |data: &[u8], _: &cpal::InputCallbackInfo| {
+                let data = data.to_vec();
+
+                send_tx.send(data).unwrap();
+            },
+            err,
+            None,
+        )
+        .unwrap();
+
+    input_stream.play().unwrap();
+    output_stream.play().unwrap();
 
     loop {
-        let input = inquire::Text::new("Message").prompt().unwrap();
+        let data = send_rx.recv().unwrap();
 
-        send.write(input.as_bytes()).await?;
+        send.write(data.as_slice()).await.unwrap();
     }
 
     Ok(())

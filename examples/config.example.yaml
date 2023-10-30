@@ -8,7 +8,7 @@
 # - Port should be 6050 and clients will automatically use that.
 #   You can set custom port at client, but I recommend use the default one
 # - Address should point to 0.0.0.0 / [::]
-address: "[::]:6050"
+address: "0.0.0.0:6050"
 
 # ################################
 
